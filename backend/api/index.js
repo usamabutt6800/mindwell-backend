@@ -183,13 +183,19 @@ app.get('/api/auth/verify', requireAdminAuth, (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-// ================= HEALTH =================
-app.get('/api/health', (_, res) => {
-  res.json({
-    success: true,
-    message: 'MindWell Psychology API running',
+// ================= HEALTH CHECK =================
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'MindWell Psychology API is running',
+    timestamp: new Date().toISOString(),
+    services: {
+      database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      email: transporter ? 'configured' : 'not configured',
+      calendar: 'active'
+    }
   });
 });
 
-// ❌ NO app.listen() on Vercel
 module.exports = app;
+
